@@ -1,7 +1,6 @@
-import { Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Express } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { tilePicture } from './utils/imageTiling';
 
 @Controller()
 export class AppController {
@@ -13,8 +12,7 @@ export class AppController {
   }
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('image'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+  tileImage(@Body() imageURL: {imageAddress: string}) {
+    tilePicture(imageURL.imageAddress)
   }
 }

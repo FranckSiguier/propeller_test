@@ -19,4 +19,10 @@ describe('AppController', () => {
       expect(appController.getHello()).toBe('Hello World!');
     });
   });
+
+  describe('[POST] /upload', () => {
+    it('Should tile the picture you gave the URL to', () => {
+    
+    })
+  })
 });
