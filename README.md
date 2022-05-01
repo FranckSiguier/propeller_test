@@ -1,6 +1,4 @@
-## If you want to launch the tests
-
-jest
+You will find the repo at this address : https://github.com/FranckSiguier/propeller_test
 
 ## Propeller Aero test
 
@@ -30,3 +28,7 @@ cd uploads
 ls
 
 Your should see all the tiles of the image from the URL you sent
+
+## If you want to launch the tests
+
+jest
