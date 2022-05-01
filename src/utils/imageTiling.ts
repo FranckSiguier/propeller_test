@@ -1,24 +1,43 @@
 import { Image } from "image-js";
+import axios from "axios";
+import path, { dirname } from "path";
+import { existsSync, mkdir } from "fs";
 
-export async function tilePicture(imageURL: string) {
-  // We get the resolution of the original image
-  const image = await Image.load(imageURL);
-  let width = image.width;
-  let height = image.height;
+export async function tilePicture(imageURL: string, folder: string) {
+  // Load the image from URL
+  const response = await axios.get(imageURL,  { responseType: 'arraybuffer' })
+  const buffer = Buffer.from(response.data, "utf-8")
 
-  // We calculate how many levels there will be for this image
-  const levels = Math.floor(Math.log2(Math.max(width, height)));
+  // Create the folder to receive the tiles
+  const dir = `${__dirname}/../../uploads/${folder}`
+  if (!existsSync(dir)) {
+    mkdir(dir, (err) => {
+      if (err) console.log(err)
+    })
+  }
 
-  // For each level we will resize the image to the correct resolution
-  // and cut each tile
-  for (let i = levels; i >= 0; i--) {
-    resizeImages(image, width, height, i);
-    width = Math.floor(width / 2);
-    height = Math.floor(height / 2);
+  try {
+    const image = await Image.load(buffer); 
+    // We get the resolution of the original image
+    let width = image.width;
+    let height = image.height;
+  
+    // We calculate how many levels there will be for this image
+    const levels = Math.floor(Math.log2(Math.max(width, height)));
+  
+    // For each level we will resize the image to the correct resolution
+    // and cut each tile
+    for (let i = levels; i >= 0; i--) {
+      resizeImages(image, width, height, i, folder);
+      width = Math.floor(width / 2);
+      height = Math.floor(height / 2);
+    }
+  } catch (error) {
+    console.log(error)
   }
 }
 
-async function resizeImages(image: Image, width: number, height: number, level: number) {
+async function resizeImages(image: Image, width: number, height: number, level: number, folder: string) {
   // We start by resizing the image to the correct resolution
   if (width === 0 || height === 0) return;
 
@@ -37,7 +56,7 @@ async function resizeImages(image: Image, width: number, height: number, level: 
       for (let k = 0; k < numberOfColums; k++) {
         const x = i * 256;
         const y = k * 256;
-        createATile(resizedImage, x, y, level);
+        createATile(resizedImage, x, y, level, folder);
       }
     }
   } catch (error) {
@@ -45,7 +64,7 @@ async function resizeImages(image: Image, width: number, height: number, level: 
   }
 }
 
-async function createATile(image: Image, x: number, y: number, level: number) {
+async function createATile(image: Image, x: number, y: number, level: number, folder: string) {
   // Name the tile
   const tileName = `${level}_${x}_${y}.jpg`;
 
@@ -78,10 +97,9 @@ async function createATile(image: Image, x: number, y: number, level: number) {
     width,
     height,
   });
-
-  // Save the image in the same folder as the original image
+  // Save the image in the file system
   try {
-    await tile.save(tileName);
+    await tile.save(`${__dirname}/../../uploads/${folder}/${tileName}`);
   } catch (err) {
     console.log(err);
   }

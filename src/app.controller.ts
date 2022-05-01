@@ -12,7 +12,11 @@ export class AppController {
   }
 
   @Post('upload')
-  tileImage(@Body() imageURL: {imageAddress: string}) {
-    tilePicture(imageURL.imageAddress)
+  tileImage(@Body() imageURL: {imageAddress: string, folder: string}): string {
+    const regex = new RegExp('.*(.jpg|.png|.jpeg).*')
+    if (!imageURL.imageAddress.match(regex)) return('The file is not an image')
+    tilePicture(imageURL.imageAddress, imageURL.folder)
+    return('It worked')
+
   }
 }
