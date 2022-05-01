@@ -25,6 +25,7 @@ Do a post request to http://localhost:3000/upload with the following JSON
 
 docker exec -it $CONTAINER_ID bash
 cd uploads
+cd 'your folder name'
 ls
 
 Your should see all the tiles of the image from the URL you sent
